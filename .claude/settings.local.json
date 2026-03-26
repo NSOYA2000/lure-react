@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(echo:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Skill(update-config)",
+      "Bash(npx:*)",
+      "Bash(git clone:*)",
+      "Bash(mkdir -p ~/.claude/plugins/marketplaces/remotion-dev)",
+      "Bash(cp -r /tmp/remotion-skills/skills/remotion ~/.claude/plugins/marketplaces/remotion-dev/)"
     ]
   }
 }
