@@ -4,3 +4,4 @@ export { default as ProfilePage } from './ProfilePage';
 export { default as EncyclopediaPage } from './EncyclopediaPage';
 export { default as AddFishingRecordPage } from './AddFishingRecordPage';
 export { default as TournamentPage } from './TournamentPage';
+export { default as CommunityPage } from './CommunityPage';

@@ -1,13 +1,36 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import { getFishList } from '../services/fish';
 
 const EncyclopediaPage = () => {
   const navigate = useNavigate();
+  const [fishList, setFishList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('全部');
 
-  const fishList = [
+  // 加载鱼种数据
+  useEffect(() => {
+    const loadFishData = async () => {
+      try {
+        const res = await getFishList();
+        setFishList(res.data || []);
+      } catch (error) {
+        console.error('加载鱼种数据失败:', error);
+        // 加载失败时使用默认数据
+        setFishList(defaultFishList);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadFishData();
+  }, []);
+
+  const defaultFishList = [
     {
-      id: 'bass',
+      id: 1,
       name: '大口黑鲈',
       latin: 'Micropterus salmoides',
       tag: '热门',
@@ -17,7 +40,7 @@ const EncyclopediaPage = () => {
       image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDlLMNU7CU_ha70rADkzDK8_9XEt0Mk2x2sVR5onj7-YmdOmfoj4S7zV0Ho4LOMF2qtcdNw4UodbWtYEvXeR5jaGJjlHE8rYzrFeIIBk9FQ2oiIc-o69knLyixtJD3qv6fa9SbCJ2iepwXMXYaNMDDFURFPTyQT-PwRqd4LexLyKaV-qK59RId3y5-lnC00O6XkAKD1VUb_iIxjmEN_hRSLHdyLtCPCrQ4_oIatR_9bTnp2t016vPazNUnA9XMSfNEJeRxG6FBxvsE'
     },
     {
-      id: 'trout',
+      id: 2,
       name: '虹鳟',
       latin: 'Oncorhynchus mykiss',
       tag: '冷水',
@@ -35,6 +58,23 @@ const EncyclopediaPage = () => {
     { icon: 'speed', color: 'text-primary-container', bgColor: 'bg-primary-container/10', title: '快速搜索', desc: '复合亮片、VIB 等高速搜索拟饵，覆盖大面积水域。' }
   ];
 
+  const categories = ['全部', '淡水鲈鱼', '鳟鱼', '狗鱼', '鲶鱼', '海水鱼'];
+
+  // 过滤鱼种列表
+  const filteredFishList = fishList.filter(fish => {
+    const matchKeyword = !searchKeyword ||
+      fish.name?.includes(searchKeyword) ||
+      fish.description?.includes(searchKeyword);
+    const matchCategory = selectedCategory === '全部' || fish.category === selectedCategory;
+    return matchKeyword && matchCategory;
+  });
+
+  // 处理搜索
+  const handleSearch = () => {
+    // 这里可以调用后端搜索 API
+    console.log('搜索:', searchKeyword);
+  };
+
   return (
     <div className="text-on-surface pb-32">
       <TopBar title="鱼种百科" showBack onBack={() => navigate(-1)} showNotification={false} />
@@ -49,6 +89,9 @@ const EncyclopediaPage = () => {
             <input
               type="text"
               placeholder="搜索鱼种、饵料、钓法..."
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               className="w-full bg-surface-container-low border-none rounded-2xl pl-12 pr-5 py-4 focus:ring-2 focus:ring-primary/20 font-body text-on-surface"
             />
           </div>
@@ -58,11 +101,12 @@ const EncyclopediaPage = () => {
         <section className="mb-8">
           <h2 className="text-lg font-bold font-headline text-on-surface mb-4">热门分类</h2>
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-            {['全部', '淡水鲈鱼', '鳟鱼', '狗鱼', '鲶鱼', '海水鱼'].map((cat, idx) => (
+            {categories.map((cat, idx) => (
               <button
                 key={idx}
+                onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-colors ${
-                  idx === 0
+                  selectedCategory === cat
                     ? 'bg-primary-container text-on-primary-container'
                     : 'bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high'
                 }`}
@@ -82,38 +126,47 @@ const EncyclopediaPage = () => {
             </button>
           </div>
 
-          <div className="space-y-4">
-            {fishList.map((fish) => (
-              <div
-                key={fish.id}
-                onClick={() => navigate(`/fish/${fish.id}`)}
-                className="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-              >
-                <div className="flex">
-                  <div className="w-32 h-32 flex-shrink-0 overflow-hidden">
-                    <img className="w-full h-full object-cover" alt={fish.name} src={fish.image} />
-                  </div>
-                  <div className="flex-1 p-5">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-xl font-bold font-headline text-on-surface mb-1">{fish.name}</h3>
-                        <p className="text-sm text-secondary mb-2">{fish.latin}</p>
-                      </div>
-                      <div className={`${fish.tagColor} px-2 py-1 rounded-lg text-xs font-bold`}>{fish.tag}</div>
+          {loading ? (
+            <div className="text-center py-10">
+              <span className="material-symbols-outlined" style={{ animation: 'spin 1s linear infinite' }}>
+                progress_activity
+              </span>
+              <p className="text-on-surface-variant mt-2">加载中...</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredFishList.map((fish) => (
+                <div
+                  key={fish.id}
+                  onClick={() => navigate(`/fish/${fish.id}`)}
+                  className="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                >
+                  <div className="flex">
+                    <div className="w-32 h-32 flex-shrink-0 overflow-hidden">
+                      <img className="w-full h-full object-cover" alt={fish.name} src={fish.image} />
                     </div>
-                    <p className="text-sm text-on-surface-variant line-clamp-2 mb-4">{fish.description}</p>
-                    <div className="flex gap-2">
-                      {fish.lures.map((lure, idx) => (
-                        <span key={idx} className="px-3 py-1 bg-surface-container-highest text-on-surface-variant text-xs rounded-full">
-                          {lure}
-                        </span>
-                      ))}
+                    <div className="flex-1 p-5">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-xl font-bold font-headline text-on-surface mb-1">{fish.name}</h3>
+                          <p className="text-sm text-secondary mb-2">{fish.latin}</p>
+                        </div>
+                        <div className={`${fish.tagColor} px-2 py-1 rounded-lg text-xs font-bold`}>{fish.tag}</div>
+                      </div>
+                      <p className="text-sm text-on-surface-variant line-clamp-2 mb-4">{fish.description}</p>
+                      <div className="flex gap-2">
+                        {fish.lures && (Array.isArray(fish.lures) ? fish.lures : JSON.parse(fish.lures || '[]')).map((lure, idx) => (
+                          <span key={idx} className="px-3 py-1 bg-surface-container-highest text-on-surface-variant text-xs rounded-full">
+                            {lure}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Techniques Section */}

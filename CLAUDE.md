@@ -16,29 +16,32 @@ npm run preview  # Preview production build
 **Tech Stack:**
 - React 19 with functional components and hooks
 - React Router DOM for navigation
-- Tailwind CSS v4 for styling (configured via `tailwind.config.js` with custom material design color palette)
+- Tailwind CSS v4 (configured via `tailwind.config.js` with custom Material Design color palette)
 - Vite for bundling
+- Axios for HTTP requests
 
 **Project Structure:**
 - `src/main.jsx` - Entry point, wraps app in BrowserRouter
 - `src/App.jsx` - Root component with global layout (font imports, BottomNav)
 - `src/routes/index.jsx` - Centralized routing with lazy-loaded pages
-- `src/pages/` - Page components (HomePage, FishDetailPage, ProfilePage, EncyclopediaPage, AddFishingRecordPage, TournamentPage)
-- `src/components/` - Reusable UI components (BottomNav, TopBar, FishCard, PostCard)
+- `src/pages/` - Page components (exports via `pages/index.js`)
+- `src/components/` - Reusable UI components (exports via `components/index.js`)
+- `src/services/` - API service layer (e.g., `fish.js` for fish-related endpoints)
+- `src/utils/` - Utilities (e.g., `request.js` for Axios instance)
 - `src/assets/images/` - Static image assets
 
-**Routing:**
-- `/` - HomePage (fishing feed)
-- `/encyclopedia` - EncyclopediaPage (fish database/articles)
-- `/fish/:id` - FishDetailPage
-- `/profile` - ProfilePage
-- `/add-record` - AddFishingRecordPage
-- `/tournament` - TournamentPage
-- `/messages` - Placeholder (not implemented)
+**API Layer:**
+- Axios instance in `src/utils/request.js` with base URL `http://localhost:8080/api`
+- Request interceptor: injects `Authorization: Bearer <token>` from localStorage
+- Response interceptor: handles 401 errors by clearing token
+- Services in `src/services/` export API functions (e.g., `getFishList`, `login`)
 
 **Design System:**
 - Material Symbols icons via Google Fonts
-- Custom font family: Manrope (headlines), Inter (body/labels)
+- Custom fonts: Manrope (headlines), Inter (body/labels)
 - Dark mode support via `class` strategy
-- Custom color palette with material design tokens (primary, secondary, tertiary, surface variants)
-- Bottom navigation with 4 main tabs + FAB (floating action button) for "add record"
+- Custom Material Design color tokens (primary, secondary, tertiary, surface variants) in `tailwind.config.js`
+- Bottom navigation with 4 tabs + FAB for "add record"
+
+## Response Style
+- 每次回答结束后，在末尾加上"喵～"

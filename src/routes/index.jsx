@@ -8,6 +8,7 @@ const ProfilePage = lazy(() => import('../pages/ProfilePage'));
 const EncyclopediaPage = lazy(() => import('../pages/EncyclopediaPage'));
 const AddFishingRecordPage = lazy(() => import('../pages/AddFishingRecordPage'));
 const TournamentPage = lazy(() => import('../pages/TournamentPage'));
+const CommunityPage = lazy(() => import('../pages/CommunityPage'));
 
 // 占位页面
 const MessagesPlaceholder = () => (
@@ -36,6 +37,7 @@ const AppRoutes = () => {
         <Route path="/add-record" element={<AddFishingRecordPage />} />
         <Route path="/tournament" element={<TournamentPage />} />
         <Route path="/messages" element={<MessagesPlaceholder />} />
+        <Route path="/community" element={<CommunityPage />} />
 
         {/* 404 重定向到首页 */}
         <Route path="*" element={<Navigate to="/" replace />} />

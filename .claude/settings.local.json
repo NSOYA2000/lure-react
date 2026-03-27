@@ -9,7 +9,10 @@
       "Bash(mkdir -p ~/.claude/plugins/marketplaces/remotion-dev)",
       "Bash(cp -r /tmp/remotion-skills/skills/remotion ~/.claude/plugins/marketplaces/remotion-dev/)",
       "WebSearch",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(claude mcp:*)",
+      "Bash(claude:*)",
+      "Bash:*"
     ]
   }
 }
